@@ -23,6 +23,25 @@ const api = async (url, head) => {
   }
 };
 
+const isNotEmpty = (value) => {
+  if (value === null || value === undefined) return false;
+  if (typeof value === "string" && value.trim().length === 0) return false;
+  if (Array.isArray(value) && value.length === 0) return false;
+  if (typeof value === "object" && Object.keys(value).length === 0)
+    return false;
+  return true;
+};
+
+const refineObj = (obj) => {
+  const arr = Object.keys(obj);
+  arr.forEach((ele) => {
+    if (!isNotEmpty(obj[ele])) {
+      delete obj[ele];
+    }
+  });
+  return obj;
+};
+
 const dura = (time) => {
   const now = new Date();
   const old = new Date(time);
@@ -33,4 +52,4 @@ const dura = (time) => {
   return { mili, sec, min, hrs };
 };
 
-module.exports = { checkLanguage, api, dura };
+module.exports = { checkLanguage, api, dura, isNotEmpty, refineObj };

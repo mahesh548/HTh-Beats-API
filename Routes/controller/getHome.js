@@ -20,9 +20,12 @@ const getHome = async (req, res) => {
     if (!data.status) return res.status(500).json({ status: "api error" });
 
     if (homeData) await home.deleteOne({ _id: homeData._id });
-    await new home({ language: langArray, data: data.data }).save();
+    const newData = await new home({
+      language: langArray,
+      data: data.data,
+    }).save();
 
-    res.json(data.data);
+    res.json(newData);
   } catch (error) {
     res.status(500).json({ status: "api error", msg: error.message });
   }

@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-
+const { refineObj } = require("../../utils");
 const homeSchema = mongoose.Schema({
   language: { type: [String], required: true },
   createdAt: {
@@ -10,13 +10,7 @@ const homeSchema = mongoose.Schema({
 });
 
 homeSchema.pre("save", function (next) {
-  /*  console.log(this);
-  const arr = Object.keys(this.data);
-  arr.forEach((ele) => {
-    if (this[ele].length == 0) {
-      delete this[ele];
-    }
-  }); */
+  this.data = refineObj(this.data);
   next();
 });
 

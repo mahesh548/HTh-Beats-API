@@ -1,13 +1,18 @@
 const mongoose = require("mongoose");
 
 const moreSchema = mongoose.Schema({
-  encrypted_drm_media_url: String,
-  encrypted_media_url: String,
-  lyrics_snippet: String,
-  artistMap: Object,
-  duration: String,
+  music: String,
   album_id: String,
-  playlist_id: String,
+  album: String,
+  label: String,
+  "320kbps": String,
+  encrypted_media_url: String,
+  encrypted_drm_media_url: String,
+  has_lyrics: String,
+  lyrics_snippet: String,
+  duration: String,
+  artistMap: Object,
+  release_date: String,
 });
 
 const songSchema = mongoose.Schema({
@@ -18,6 +23,7 @@ const songSchema = mongoose.Schema({
   image: { type: String, required: true },
   language: String,
   year: String,
+  play_count: String,
   more_info: moreSchema,
 });
 

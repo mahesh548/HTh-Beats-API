@@ -1,5 +1,5 @@
 const { api } = require("../../utils");
-const { getPlayListSongs, addSongs } = require("./manageSongs");
+const { getSongs, addSongs } = require("./manageSongs");
 const Playlist = require("../../Database/Models/Playlist");
 
 const getPlaylist = async (req, res) => {
@@ -12,7 +12,7 @@ const getPlaylist = async (req, res) => {
     const playListData = await Playlist.findOne({ perma_url: id });
     if (playListData) {
       let responseData = playListData.toObject();
-      responseData.list = await getPlayListSongs(responseData.idList);
+      responseData.list = await getSongs(responseData.idList);
       return res.status(200).json(responseData);
     }
 

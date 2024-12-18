@@ -1,5 +1,5 @@
 const song = require("../../Database/Models/Song");
-const getPlayListSongs = async (ids) => {
+const getSongs = async (ids) => {
   try {
     const data = await song.find({ id: { $in: ids } });
     return data;
@@ -26,4 +26,4 @@ const addSongs = async (list) => {
   }
 };
 
-module.exports = { getPlayListSongs, addSongs };
+module.exports = { getSongs, addSongs };

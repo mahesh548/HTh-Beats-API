@@ -14,7 +14,7 @@ const checkLanguage = (langString) => {
 };
 
 //get request
-const api = async (url, head) => {
+const api = async (url, head = {}) => {
   try {
     const req = await axios.get(url, { headers: head });
     return { status: true, data: req.data };

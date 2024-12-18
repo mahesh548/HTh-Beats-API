@@ -1,0 +1,36 @@
+const languages = ["Hindi", "English", "Bhojpuri", "Punjabi"];
+const axios = require("axios");
+
+//validating language passed by user
+const checkLanguage = (langString) => {
+  if (!langString) return false;
+  const arrayOfLang = langString.split(",");
+  if (arrayOfLang.length == 0) return false;
+
+  for (let index = 0; index < arrayOfLang.length; index++) {
+    if (languages.indexOf(arrayOfLang[index]) == -1) return false;
+  }
+  return true;
+};
+
+//get request
+const api = async (url, head) => {
+  try {
+    const req = await axios.get(url, { headers: head });
+    return { status: true, data: req.data };
+  } catch (error) {
+    return { status: false, msg: error.message };
+  }
+};
+
+const dura = (time) => {
+  const now = new Date();
+  const old = new Date(time);
+  const mili = now - old;
+  const sec = Math.floor(mili / 1000);
+  const min = Math.floor(sec / 60);
+  const hrs = Math.floor(min / 60);
+  return { mili, sec, min, hrs };
+};
+
+module.exports = { checkLanguage, api, dura };

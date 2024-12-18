@@ -71,6 +71,13 @@ const getEntityUrl = (name, token = "") => {
   return urls[name][0] + token + urls[name][1];
 };
 
+const removeObjectId = (array) => {
+  if (array.length != 0) {
+    array.forEach((item) => delete item?._id);
+    return array;
+  }
+};
+
 module.exports = {
   checkLanguage,
   api,
@@ -78,4 +85,5 @@ module.exports = {
   isNotEmpty,
   refineObj,
   getEntityUrl,
+  removeObjectId,
 };

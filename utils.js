@@ -1,6 +1,21 @@
 const languages = ["Hindi", "English", "Bhojpuri", "Punjabi"];
 const axios = require("axios");
 
+const urls = {
+  playlist: [
+    "https://www.jiosaavn.com/api.php?__call=webapi.get&token=",
+    "&type=playlist&p=1&n=50&includeMetaTags=0&ctx=web6dot0&api_version=4&_format=json&_marker=0",
+  ],
+  album: [
+    "https://www.jiosaavn.com/api.php?__call=webapi.get&token=",
+    "&type=album&includeMetaTags=0&ctx=wap6dot0&api_version=4&_format=json&_marker=0",
+  ],
+  mix: [
+    "https://www.jiosaavn.com/api.php?__call=webapi.get&token=",
+    "&type=mix&p=1&n=20&includeMetaTags=0&ctx=wap6dot0&api_version=4&_format=json&_marker=0",
+  ],
+};
+
 //validating language passed by user
 const checkLanguage = (langString) => {
   if (!langString) return false;
@@ -51,5 +66,16 @@ const dura = (time) => {
   const hrs = Math.floor(min / 60);
   return { mili, sec, min, hrs };
 };
+const getEntityUrl = (name, token = "") => {
+  if (Object.keys(urls).indexOf(name) == -1) return "";
+  return urls[name][0] + token + urls[name][1];
+};
 
-module.exports = { checkLanguage, api, dura, isNotEmpty, refineObj };
+module.exports = {
+  checkLanguage,
+  api,
+  dura,
+  isNotEmpty,
+  refineObj,
+  getEntityUrl,
+};

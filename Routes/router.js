@@ -1,11 +1,10 @@
 const express = require("express");
 //Controllers
 const getHome = require("./controller/getHome");
-const getPlaylist = require("./controller/getPlaylist");
-const getAlbum = require("./controller/getAlbum");
+const getEntity = require("./controller/getEntity");
+
 const router = express.Router();
 
 router.get("/api/home", getHome);
-router.get("/api/playlist", getPlaylist);
-router.get("/api/album", getAlbum);
+router.get("/api/:entity", getEntity);
 module.exports = router;

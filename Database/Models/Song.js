@@ -25,6 +25,16 @@ const songSchema = mongoose.Schema({
   year: String,
   play_count: String,
   more_info: moreSchema,
+  perma_url: String,
 });
 
+songSchema.pre("insertMany", async function (next, docs) {
+  for (const doc of docs) {
+    if (doc?.perma_url?.length != 0) {
+      const splitter = doc.perma_url.split("/");
+      doc.perma_url = splitter[splitter.length - 1];
+    }
+  }
+  next();
+});
 module.exports = mongoose.model("song", songSchema);

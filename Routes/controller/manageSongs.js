@@ -17,7 +17,7 @@ const addSongs = async (list) => {
         (item) => exisitngSongsIds.indexOf(item.id) == -1
       );
       if (insertingData) {
-        await song.insertMany(insertingData);
+        await song.insertMany(insertingData, { runHooks: true });
       }
     }
     return ids;

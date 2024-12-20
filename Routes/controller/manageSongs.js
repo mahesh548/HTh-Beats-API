@@ -7,19 +7,24 @@ const getSongs = async (ids) => {
     return { status: "error", msg: error.message };
   }
 };
+
 const addSongs = async (list) => {
   try {
     const ids = list.map((item) => item.id);
     const exisitngSongs = await song.find({ id: { $in: ids } });
-    if (exisitngSongs) {
-      const exisitngSongsIds = exisitngSongs.map((item) => item.id);
-      let insertingData = list.filter(
-        (item) => exisitngSongsIds.indexOf(item.id) == -1
-      );
-      if (insertingData) {
-        await song.insertMany(insertingData, { runHooks: true });
-      }
+
+    const exisitngSongsIds = exisitngSongs.length
+      ? exisitngSongs.map((item) => item.id)
+      : [];
+
+    const insertingData = list.filter(
+      (item) => !exisitngSongsIds.includes(item.id)
+    );
+
+    if (insertingData.length) {
+      await song.insertMany(insertingData, { runHooks: true });
     }
+
     return ids;
   } catch (error) {
     return error.message;

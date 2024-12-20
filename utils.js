@@ -78,6 +78,16 @@ const removeObjectId = (array) => {
   }
 };
 
+const mergeOnIds = (array1, array2) => {
+  const ids = array1.map((item) => item.id);
+  array2.forEach((item) => {
+    if (!ids.includes(item.id)) {
+      array1.push(item);
+    }
+  });
+  return array1;
+};
+
 module.exports = {
   checkLanguage,
   api,
@@ -86,4 +96,5 @@ module.exports = {
   refineObj,
   getEntityUrl,
   removeObjectId,
+  mergeOnIds,
 };

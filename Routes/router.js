@@ -4,11 +4,14 @@ const getHome = require("./controller/getHome");
 const getEntity = require("./controller/getEntity");
 const getArtist = require("./controller/getArtist");
 const getSong = require("./controller/getSong");
+const getSearch = require("./controller/getSearch");
 
 const router = express.Router();
 
 router.get("/api/home", getHome);
 router.get("/api/artist", getArtist);
 router.get("/api/song", getSong);
-router.get("/api/:entity", getEntity);
+router.get("/api/search", getSearch);
+
+router.get("/api/entity/:entity", getEntity);
 module.exports = router;

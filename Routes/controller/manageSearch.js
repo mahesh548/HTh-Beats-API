@@ -41,12 +41,11 @@ const searchQuery = async (q) => {
   const searchData = mergeOnIds(searching, songs); //merging both data
   if (searchData.length >= 15) return searchData; //return data to user if result is enough
 
-  const record = await searchRecord.findOne({
-    query: { $regex: `^${q}`, $options: "i" },
-  }); // if result not enough search if search term is already called to api
-  if (record) {
-    const specificSearch = await Search.find({ id: { $in: record.ids } }); //if already searched by api then get item by their specific id
-
+  const record = await searchRecord.findQuerySound(q); // if result not enough search if search term is already called to api
+  if (record.length != 0) {
+    const specificSearch = await Search.find({
+      id: { $in: record },
+    }); //if already searched by api then get item by their specific id
     return mergeOnIds(searchData, specificSearch); //merging data and sending back
   }
   const data = await api(

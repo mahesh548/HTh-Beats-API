@@ -1,4 +1,5 @@
 const languages = ["Hindi", "English", "Bhojpuri", "Punjabi"];
+const smallLanguages = ["hindi", "english", "bhojpuri", "punjabi"];
 const axios = require("axios");
 
 const urls = {
@@ -24,6 +25,17 @@ const checkLanguage = (langString) => {
 
   for (let index = 0; index < arrayOfLang.length; index++) {
     if (languages.indexOf(arrayOfLang[index]) == -1) return false;
+  }
+  return true;
+};
+//validating language passed by user
+const checkLanguageSmall = (langString) => {
+  if (!langString) return false;
+  const arrayOfLang = langString.split(",");
+  if (arrayOfLang.length == 0) return false;
+
+  for (let index = 0; index < arrayOfLang.length; index++) {
+    if (smallLanguages.indexOf(arrayOfLang[index]) == -1) return false;
   }
   return true;
 };
@@ -97,4 +109,5 @@ module.exports = {
   getEntityUrl,
   removeObjectId,
   mergeOnIds,
+  checkLanguageSmall,
 };

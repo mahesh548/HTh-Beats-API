@@ -76,7 +76,7 @@ const searchSearch = async (q) => {
           { description: { $regex: `\\b${q}`, $options: "i" } },
         ],
       },
-      ["title", "subtitle", "type", "image", "url"]
+      ["title", "subtitle", "type", "image", "url", "perma_url"]
     ).limit(20);
 
     return data;

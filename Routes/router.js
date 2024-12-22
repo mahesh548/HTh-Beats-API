@@ -8,6 +8,7 @@ const getSearch = require("./controller/getSearch");
 const getRelated = require("./controller/getRelated");
 const getTrending = require("./controller/getTrending");
 const getQueue = require("./controller/getQueue");
+const getRadio = require("./controller/getRadio");
 
 const router = express.Router();
 
@@ -18,6 +19,7 @@ router.get("/api/search", getSearch);
 router.get("/api/related", getRelated);
 router.get("/api/trending", getTrending);
 router.get("/api/queue", getQueue);
+router.get("/api/radio", getRadio);
 
 router.get("/api/entity/:entity", getEntity);
 module.exports = router;

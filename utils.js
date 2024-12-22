@@ -100,6 +100,16 @@ const mergeOnIds = (array1, array2) => {
   return array1;
 };
 
+const objToArr = (obj) => {
+  let array = [];
+  for (key in obj) {
+    if (obj[key]?.song) {
+      array.push(obj[key].song);
+    }
+  }
+  return array;
+};
+
 module.exports = {
   checkLanguage,
   api,
@@ -110,4 +120,5 @@ module.exports = {
   removeObjectId,
   mergeOnIds,
   checkLanguageSmall,
+  objToArr,
 };

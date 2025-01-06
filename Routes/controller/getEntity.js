@@ -6,6 +6,7 @@ const Entity = require("../../Database/Models/Entity");
 const getEntity = async (req, res) => {
   const id = req?.query?.id;
   const entityType = req?.params?.entity;
+  const user = req.body.user;
   if (getEntityUrl(entityType).length == 0 || !id)
     return res
       .status(400)
@@ -15,6 +16,14 @@ const getEntity = async (req, res) => {
       perma_url: id,
     });
     if (entityData) {
+      if (
+        Array.isArray(entityData?.data?.userId) &&
+        entityData.data.userId.indexOf(user.id) == -1
+      ) {
+        return res
+          .status(405)
+          .json({ status: false, msg: "user does not own this playlist!" });
+      }
       let responseData = entityData.toObject();
       responseData.list = await getSongs(responseData.idList);
       return res.status(200).json(responseData);

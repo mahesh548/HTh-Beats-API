@@ -11,7 +11,9 @@ const getEntity = async (req, res) => {
       .status(400)
       .json({ status: false, msg: "Entity id or types are missing!" });
   try {
-    const entityData = await Entity.findOne({ perma_url: id });
+    const entityData = await Entity.findOne({
+      perma_url: id,
+    });
     if (entityData) {
       let responseData = entityData.toObject();
       responseData.list = await getSongs(responseData.idList);

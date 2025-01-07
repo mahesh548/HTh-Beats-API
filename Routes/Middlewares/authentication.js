@@ -1,8 +1,7 @@
 const jwt = require("jsonwebtoken");
 const Users = require("../../Database/Models/Users");
 const auth = async (req, res, next) => {
-  const { session } = req.cookies;
-
+  const session = req.headers?.authorization.split(" ")[1];
   if (!session) return res.status(401).json({ status: false, auth: false });
   const secrate = process.env.SECRATE;
   try {
@@ -16,12 +15,11 @@ const auth = async (req, res, next) => {
     realUser.session = refreshedToken;
     realUser.save();
     req.body.user = user;
-    res.cookie("session", refreshedToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "strict",
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-    });
+
+    //setting session token into header
+    res.setHeader("session", refreshedToken);
+    res.setHeader("Access-Control-Expose-Headers", "session");
+
     next();
   } catch (error) {
     return res.status(401).json({ status: false, auth: false });

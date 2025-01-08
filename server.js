@@ -3,7 +3,6 @@ const express = require("express");
 const router = require("./Routes/router");
 const auth = require("./Routes/Middlewares/authentication");
 const connectDB = require("./Database/connect")();
-const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 
@@ -18,7 +17,6 @@ const app = express();
 
 //Middlewares
 app.use(cors(corsOptions));
-app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(express.json());
 

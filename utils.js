@@ -110,6 +110,23 @@ const objToArr = (obj) => {
   return array;
 };
 
+const isAllowed = (userId, id) => {
+  // if playlist has no userId array allow access
+  if (!Array.isArray(userId)) return true;
+
+  // if userId has no user then allow access
+  if (userId.length == 0) return true;
+
+  // if userId array have some user
+  if (userId.includes(id)) {
+    // if userId contain user
+    return true;
+  } else {
+    // if userId don't contain user
+    return false;
+  }
+};
+
 module.exports = {
   checkLanguage,
   api,
@@ -121,4 +138,5 @@ module.exports = {
   mergeOnIds,
   checkLanguageSmall,
   objToArr,
+  isAllowed,
 };

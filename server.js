@@ -10,7 +10,10 @@ const cors = require("cors");
 const frontendUrl = process.env.FURL;
 const corsOptions = {
   origin: frontendUrl,
-  methods: ["GET", "POST"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: "*",
+  credentials: true,
+  exposedHeaders: "session",
 };
 
 const app = express();

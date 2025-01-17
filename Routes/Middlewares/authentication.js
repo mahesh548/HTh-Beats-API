@@ -1,6 +1,8 @@
 const jwt = require("jsonwebtoken");
 const Users = require("../../Database/Models/Users");
 const auth = async (req, res, next) => {
+  if (!req?.headers?.authorization)
+    return res.status(401).json({ status: false, auth: false });
   const session = req.headers?.authorization.split(" ")[1];
   if (!session) return res.status(401).json({ status: false, auth: false });
   const secrate = process.env.SECRATE;

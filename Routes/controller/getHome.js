@@ -7,15 +7,16 @@ const getHome = async (req, res) => {
   const langArray = req.query.lang.split(",").sort();
 
   try {
-    const homeData = await home.findOne({ language: langArray });
+    const homeData = await home.findOne({ language: langArray }, ["-_id"]);
     if (homeData && dura(homeData.createdAt).hrs < 24) {
-      return res.json(homeData);
+      return res.status(200).json(homeData);
     }
 
     const data = await api(
       "https://www.jiosaavn.com/api.php?__call=webapi.getLaunchData&api_version=4&_format=json&_marker=0&ctx=web6dot0",
       { cookie: `L=${req.query.lang}` }
     );
+    console.log(Object.keys(data.data));
 
     if (!data.status) return res.status(500).json({ status: "api error" });
 
@@ -25,7 +26,7 @@ const getHome = async (req, res) => {
       data: data.data,
     }).save();
 
-    res.json(newData);
+    res.status(200).json(newData);
   } catch (error) {
     res.status(500).json({ status: "api error", msg: error.message });
   }

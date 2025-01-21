@@ -25,6 +25,10 @@ const getEntity = async (req, res) => {
 
       responseData.list = await getSongs(responseData.idList);
       responseData.list_count = String(responseData.list.length);
+      delete responseData.userId;
+      delete responseData.idList;
+      delete responseData._id;
+      delete responseData.__v;
       return res.status(200).json(responseData);
     }
 

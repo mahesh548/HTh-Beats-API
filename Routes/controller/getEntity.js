@@ -2,7 +2,7 @@ const { api, getEntityUrl, isAllowed } = require("../../utils");
 const { getSongs, addSongs } = require("./manageSongs");
 
 const Entity = require("../../Database/Models/Entity");
-
+const Library = require("../../Database/Models/Library");
 const getEntity = async (req, res) => {
   const id = req?.query?.id;
   const entityType = req?.params?.entity;
@@ -15,6 +15,7 @@ const getEntity = async (req, res) => {
     const entityData = await Entity.findOne({
       perma_url: id,
     });
+
     if (entityData) {
       let responseData = entityData.toObject();
       if (!isAllowed(responseData?.userId, user.id)) {
@@ -22,7 +23,15 @@ const getEntity = async (req, res) => {
           .status(405)
           .json({ status: false, msg: "user does not own this playlist!" });
       }
-
+      responseData.isLiked = false;
+      //check if user save this playlist
+      const likeData = await Library.findOne({
+        userId: user.id,
+        id: responseData.id,
+      });
+      if (likeData) {
+        responseData.isLiked = true;
+      }
       responseData.list = await getSongs(responseData.idList);
       responseData.list_count = String(responseData.list.length);
       delete responseData.userId;

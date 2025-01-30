@@ -32,7 +32,7 @@ const getEntity = async (req, res) => {
       if (likeData) {
         responseData.isLiked = true;
       }
-      responseData.list = await getSongs(responseData.idList);
+      responseData.list = await getSongs(responseData.idList, user.id);
       responseData.list_count = String(responseData.list.length);
       delete responseData.userId;
       delete responseData.idList;

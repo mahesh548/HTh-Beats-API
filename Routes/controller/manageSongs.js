@@ -1,7 +1,24 @@
+const Entity = require("../../Database/Models/Entity");
 const song = require("../../Database/Models/Song");
-const getSongs = async (ids) => {
+const getSongs = async (ids, userId) => {
   try {
-    const data = await song.find({ id: { $in: ids } });
+    const data = await song.find({ id: { $in: ids } }).lean();
+    const saveIn = await Entity.find({ userId: userId, idList: { $in: ids } }, [
+      "idList",
+      "title",
+      "id",
+      "perma_url",
+    ]).lean();
+
+    data.map((item) => {
+      const playThatSaveIt = saveIn
+        .filter((playlist) => playlist.idList.includes(item.id))
+        .map(({ idList, ...playlist }) => playlist);
+
+      item.savedIn = playThatSaveIt;
+      return item;
+    });
+
     return data;
   } catch (error) {
     return { status: "error", msg: error.message };
@@ -27,6 +44,7 @@ const addSongs = async (list) => {
 
     return ids;
   } catch (error) {
+    console.log(error);
     return error.message;
   }
 };

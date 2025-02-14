@@ -54,6 +54,8 @@ const getEntity = async (req, res) => {
     data.data.perma_url = id;
     data.data.idList = newEntity.idList;
 
+    data.data.list = await getSongs(data.data.idList, user.id);
+
     return res.status(200).json(data.data);
   } catch (error) {
     return res.status(500).json({ status: false, msg: error.message });

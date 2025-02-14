@@ -5,7 +5,7 @@ const axios = require("axios");
 const urls = {
   playlist: [
     "https://www.jiosaavn.com/api.php?__call=webapi.get&token=",
-    "&type=playlist&p=1&n=50&includeMetaTags=0&ctx=web6dot0&api_version=4&_format=json&_marker=0",
+    "&type=playlist&p=1&n=50&includeMetaTags=0&ctx=wap6dot0&api_version=4&_format=json&_marker=0",
   ],
   album: [
     "https://www.jiosaavn.com/api.php?__call=webapi.get&token=",

@@ -5,15 +5,13 @@ const getSongs = async (ids, userId) => {
     const data = await song.find({ id: { $in: ids } }).lean();
     const saveIn = await Entity.find({ userId: userId, idList: { $in: ids } }, [
       "idList",
-      "title",
       "id",
-      "perma_url",
     ]).lean();
 
     data.map((item) => {
       const playThatSaveIt = saveIn
         .filter((playlist) => playlist.idList.includes(item.id))
-        .map(({ idList, ...playlist }) => playlist);
+        .map((playlist) => playlist.id);
 
       item.savedIn = playThatSaveIt;
       return item;

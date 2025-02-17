@@ -25,7 +25,7 @@ router.get("/api/song", getSong);
 // query: "q" search term
 router.get("/api/search", getSearch);
 
-// query: "entityType" playlist,song,album & "id"
+// query: "entity" playlist,song,album & "id"
 router.get("/api/related", getRelated);
 
 // query: "entityType" playlist,album & "lang"

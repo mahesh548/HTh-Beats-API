@@ -4,6 +4,7 @@ const { getSongs, addSongs } = require("./manageSongs");
 const Library = require("../../Database/Models/Library");
 const getArtist = async (req, res) => {
   const id = req?.query?.id;
+  const user = req.body.user;
   if (!id)
     return res
       .status(400)

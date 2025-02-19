@@ -1,6 +1,7 @@
 const { api, removeObjectId } = require("../../utils");
 const Artist = require("../../Database/Models/Artist");
 const { getSongs, addSongs } = require("./manageSongs");
+const Library = require("../../Database/Models/Library");
 const getArtist = async (req, res) => {
   const id = req?.query?.id;
   if (!id)
@@ -13,6 +14,15 @@ const getArtist = async (req, res) => {
     if (artistData) {
       let responseData = artistData.toObject();
       responseData.topSongs = await getSongs(responseData.topSongsIds);
+      responseData.isLiked = false;
+      //check if user save this playlist
+      const likeData = await Library.findOne({
+        userId: user.id,
+        id: responseData.id,
+      });
+      if (likeData) {
+        responseData.isLiked = true;
+      }
       return res.status(200).json(responseData);
     }
 

@@ -27,7 +27,7 @@ const getArtist = async (req, res) => {
     }
 
     const data = await api(
-      `https://www.jiosaavn.com/api.php?__call=webapi.get&token=${id}&type=artist&p=&n_song=50&n_album=50&sub_type=&category=&sort_order=&includeMetaTags=0&ctx=web6dot0&api_version=4&_format=json&_marker=0`
+      `https://www.jiosaavn.com/api.php?__call=webapi.get&token=${id}&type=artist&p=&n_song=50&n_album=10&sub_type=&category=&sort_order=&includeMetaTags=0&ctx=web6dot0&api_version=4&_format=json&_marker=0`
     );
 
     if (!data.status) return res.status(500).json({ status: "api error" });

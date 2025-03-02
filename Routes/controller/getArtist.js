@@ -45,6 +45,7 @@ const getArtist = async (req, res) => {
     await newArtist.save();
 
     data.data.perma_url = id;
+    data.data.isLiked = false;
 
     res.status(200).json(data.data);
   } catch (error) {

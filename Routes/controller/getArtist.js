@@ -19,7 +19,7 @@ const getArtist = async (req, res) => {
       //check if user save this playlist
       const likeData = await Library.findOne({
         userId: user.id,
-        id: responseData.id,
+        id: responseData.artistId,
       });
       if (likeData) {
         responseData.isLiked = true;
@@ -46,6 +46,9 @@ const getArtist = async (req, res) => {
 
     data.data.perma_url = id;
     data.data.isLiked = false;
+    data.data.idList = newEntity.idList;
+
+    data.data.list = await getSongs(data.data.idList, user.id);
 
     res.status(200).json(data.data);
   } catch (error) {

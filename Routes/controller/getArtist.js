@@ -46,7 +46,7 @@ const getArtist = async (req, res) => {
 
     data.data.perma_url = id;
     data.data.isLiked = false;
-    data.data.idList = newEntity.idList;
+    data.data.idList = newArtist.idList;
 
     data.data.list = await getSongs(data.data.idList, user.id);
 

@@ -13,7 +13,7 @@ const getSong = async (req, res) => {
     );
     if (!data.status) return res.status(500).json({ status: "api error" });
     await addSongs(data.data.songs);
-    res.status(200).json(data.data);
+    res.status(200).json(data.data?.songs[0]);
   } catch (error) {
     res.status(500).json({ status: false, msg: error.message });
   }

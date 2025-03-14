@@ -46,9 +46,8 @@ const getArtist = async (req, res) => {
 
     data.data.perma_url = id;
     data.data.isLiked = false;
-    data.data.idList = newArtist.idList;
 
-    data.data.list = await getSongs(data.data.idList, user.id);
+    data.data.topSongs = await getSongs(data.data.topSongsIds, user.id);
 
     res.status(200).json(data.data);
   } catch (error) {

@@ -10,7 +10,7 @@ const auth = async (req, res, next) => {
   const secrate = process.env.SECRATE;
   try {
     const user = jwt.verify(session, secrate);
-    const isExpired = utils.dura(user.iat * 1000).min > 5;
+    const isExpired = utils.dura(user.iat * 1000).min > 2;
     const realUser = await Users.findOne({ id: user.id });
     if (realUser.session != session && isExpired)
       return res.status(401).json({ status: false, auth: false });

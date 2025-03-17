@@ -117,6 +117,9 @@ const isAllowed = (userId, id) => {
   // if userId has no user then allow access
   if (userId.length == 0) return true;
 
+  // check if playlist viewOnly
+  if (userId.includes("viewOnly")) return true;
+
   // if userId array have some user
   if (userId.includes(id)) {
     // if userId contain user

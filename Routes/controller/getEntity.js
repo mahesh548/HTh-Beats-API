@@ -3,6 +3,7 @@ const { getSongs, addSongs } = require("./manageSongs");
 
 const Entity = require("../../Database/Models/Entity");
 const Library = require("../../Database/Models/Library");
+const Users = require("../../Database/Models/Users");
 const getEntity = async (req, res) => {
   const id = req?.query?.id;
   const entityType = req?.params?.entity;
@@ -35,6 +36,15 @@ const getEntity = async (req, res) => {
       responseData.list = await getSongs(responseData.idList, user.id);
       responseData.list_count = String(responseData.list.length);
       responseData.entityType = checkPlaylistType(responseData, user.id);
+      if (
+        responseData.entityType == "private" ||
+        responseData.entityType == "collab"
+      ) {
+        responseData.ownerInfo = await Users.find(
+          { id: { $in: responseData.userId } },
+          { username: 1, pic: 1, _id: 0 }
+        );
+      }
       delete responseData.idList;
       delete responseData._id;
       delete responseData.__v;

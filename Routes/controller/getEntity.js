@@ -50,6 +50,10 @@ const getEntity = async (req, res) => {
       delete responseData.__v;
       return res.status(200).json(responseData);
     }
+    if (id.length == 20)
+      return res
+        .status(200)
+        .json({ status: false, msg: "Playlist is unavailable!" });
 
     const data = await api(getEntityUrl(entityType, id));
 
@@ -69,7 +73,10 @@ const getEntity = async (req, res) => {
 
     return res.status(200).json(data.data);
   } catch (error) {
-    return res.status(500).json({ status: false, msg: error.message });
+    console.log("Get Entity Error:", error);
+    return res
+      .status(200)
+      .json({ status: false, msg: "Playlist is unavailable!" });
   }
 };
 const checkPlaylistType = (response, userId) => {

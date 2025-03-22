@@ -40,10 +40,18 @@ const getEntity = async (req, res) => {
         responseData.entityType == "private" ||
         responseData.entityType == "collab"
       ) {
-        responseData.ownerInfo = await Users.find(
+        const ownerInfo = await Users.find(
           { id: { $in: responseData.userId } },
-          { username: 1, pic: 1, _id: 0 }
-        );
+          { username: 1, pic: 1, _id: 0, id: 1 }
+        ).lean();
+        responseData.ownerInfo = ownerInfo.map((item) => {
+          if (item.id == responseData.owner) {
+            item.role = "admin";
+          } else {
+            item.role = "member";
+          }
+          return item;
+        });
       }
       delete responseData.idList;
       delete responseData._id;

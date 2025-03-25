@@ -1,6 +1,6 @@
 const { api, objToArr, dura } = require("../../utils");
 const Song = require("../../Database/Models/Song");
-const { addSongs } = require("./manageSongs");
+const { addSongs, getSongs } = require("./manageSongs");
 const { addSearch } = require("./manageSearch");
 const Queue = require("../../Database/Models/Queue");
 const getUrl = (type, para1, para2 = "") => {
@@ -27,6 +27,7 @@ const getRadio = async (req, res) => {
   const type = req?.query?.entity;
   const name = req?.query?.name;
   const lang = req?.query?.lang;
+  const user = req.body.user;
 
   if (getUrl(type, lang, name).length == 0)
     return res
@@ -37,27 +38,27 @@ const getRadio = async (req, res) => {
       station: [lang.toLowerCase(), name.toLowerCase()],
     });
     if (queueFind && dura(queueFind.createdAt).hrs < 160) {
-      const respondData = await Song.find({ id: { $in: queueFind.ids } });
-      return res.status(200).json(respondData);
+      const respondData = await getSongs(queueFind.ids, user.id);
+      return res.status(200).json({ status: true, data: respondData });
     }
 
     const data = await api(getUrl(type, lang, name));
-    if (!data.status) return res.status(500).json({ status: "api error" });
-    if (!data?.data?.stationid)
-      return res.status(500).json({ status: "api error" });
+    if (!data.status) return res.status(500).json({ status: false });
+    if (!data?.data?.stationid) return res.status(500).json({ status: false });
 
     const queueData = await api(getUrl("queue", data.data.stationid));
-    if (!queueData.status) return res.status(500).json({ status: "api error" });
+    if (!queueData.status) return res.status(500).json({ status: false });
     if (queueFind) await Queue.deleteOne({ _id: queueFind._id });
     const arr = objToArr(queueData.data);
 
     const songIds = await addSongs(arr);
-    await addSearch(arr);
+    /*  await addSearch(arr); */
     await new Queue({
       station: [lang.toLowerCase(), name.toLowerCase()],
       ids: songIds,
     }).save();
-    res.status(200).json(arr);
+    const respondData = await getSongs(songIds, user.id);
+    return res.status(200).json({ status: true, data: respondData });
   } catch (error) {
     res.status(500).json({ status: false, msg: error.message });
   }

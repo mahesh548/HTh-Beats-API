@@ -1,7 +1,7 @@
 const { searchGet } = require("./manageSearch");
 
 const getSearch = async (req, res) => {
-  const q = req?.query?.q.toLowerCase();
+  const q = req?.query?.q.toLowerCase().trim();
   const autocomplete = req?.query?.autocomplete;
   if (!q || !autocomplete)
     return res

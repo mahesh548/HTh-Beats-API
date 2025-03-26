@@ -78,8 +78,8 @@ const searchSearch = async (q) => {
     const data = await Search.find(
       {
         $or: [
-          { title: { $regex: q, $options: "i" } },
-          { subtitle: { $regex: q, $options: "i" } },
+          { title: { $regex: `\\b${q}`, $options: "i" } },
+          { subtitle: { $regex: `\\b${q}`, $options: "i" } },
         ],
       },
       ["title", "subtitle", "type", "image", "url", "perma_url", "id"]
@@ -97,8 +97,8 @@ const searchSongs = async (q) => {
     const data = await Song.find(
       {
         $or: [
-          { title: { $regex: q, $options: "i" } },
-          { subtitle: { $regex: q, $options: "i" } },
+          { title: { $regex: `\\b${q}`, $options: "i" } },
+          { subtitle: { $regex: `\\b${q}`, $options: "i" } },
         ],
       },
       ["title", "subtitle", "type", "image", "perma_url", "id"]
@@ -114,11 +114,17 @@ const searchEntity = async (q) => {
   try {
     const data = await Entity.find(
       {
-        $or: [
-          { title: { $regex: q, $options: "i" } },
-          { subtitle: { $regex: q, $options: "i" } },
+        $and: [
+          {
+            $or: [
+              { title: { $regex: `\\b${q}`, $options: "i" } },
+              { subtitle: { $regex: `\\b${q}`, $options: "i" } },
+            ],
+          },
+          {
+            $or: [{ userId: { $exists: false } }, { userId: { $size: 0 } }],
+          },
         ],
-        $or: [{ userId: { $exists: false } }, { userId: { $size: 0 } }],
       },
       ["title", "subtitle", "type", "image", "perma_url", "id"]
     ).limit(10);

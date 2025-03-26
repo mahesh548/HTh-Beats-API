@@ -1,7 +1,7 @@
 const { api, mergeOnIds, uniqueItemFromArray } = require("../../utils");
 const Song = require("../../Database/Models/Song");
 const Search = require("../../Database/Models/Search");
-const Entity = require("../../Database/Models/Search");
+const Entity = require("../../Database/Models/Entity");
 const searchRecord = require("../../Database/Models/Record");
 
 const searchGet = async (q, autocomplete) => {
@@ -42,7 +42,7 @@ const searchQuery = async (q, autocomplete) => {
 
   const searchData = uniqueItemFromArray([searching, songs, entity]); //merging all data
 
-  if (searchData.length >= 15) return { status: true, data: searchData }; //return data to user if result is enough
+  if (searchData.length >= 20) return { status: true, data: searchData }; //return data to user if result is enough
 
   const record = await searchRecord.findQuerySound(q); // if result not enough search if search term is already called to api
   if (record.length != 0) {

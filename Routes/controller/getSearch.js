@@ -2,12 +2,13 @@ const { searchGet } = require("./manageSearch");
 
 const getSearch = async (req, res) => {
   const q = req?.query?.q.toLowerCase();
-  if (!q)
+  const autocomplete = req?.query?.autocomplete;
+  if (!q || !autocomplete)
     return res
       .status(400)
       .json({ status: false, msg: "Search query is empty" });
 
-  const data = await searchGet(q);
+  const data = await searchGet(q, autocomplete);
 
   res.status(200).json(data);
   try {

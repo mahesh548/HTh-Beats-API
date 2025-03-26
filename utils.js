@@ -99,6 +99,12 @@ const mergeOnIds = (array1, array2) => {
   });
   return array1;
 };
+const uniqueItemFromArray = (data) => {
+  const uniqueItems = Array.from(
+    new Map(data.flat().map((item) => [item.id, item])).values()
+  );
+  return uniqueItems;
+};
 
 const objToArr = (obj) => {
   let array = [];
@@ -142,4 +148,5 @@ module.exports = {
   checkLanguageSmall,
   objToArr,
   isAllowed,
+  uniqueItemFromArray,
 };

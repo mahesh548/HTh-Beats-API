@@ -16,7 +16,7 @@ const getArtist = async (req, res) => {
       let responseData = artistData.toObject();
       responseData.topSongs = await getSongs(responseData.topSongsIds, user.id);
       responseData.isLiked = false;
-      //check if user save this playlist
+      //check if user save this artist
       const likeData = await Library.findOne({
         userId: user.id,
         id: responseData.artistId,

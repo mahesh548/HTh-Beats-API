@@ -4,6 +4,7 @@ const Search = require("../../Database/Models/Search");
 const Entity = require("../../Database/Models/Entity");
 const Artist = require("../../Database/Models/Artist");
 const searchRecord = require("../../Database/Models/Record");
+const Library = require("../../Database/Models/Library");
 
 const searchGet = async (q, autocomplete) => {
   try {
@@ -55,7 +56,7 @@ const searchQuery = async (q, autocomplete) => {
     });
 
     const mergedData = uniqueItemFromArray(searchData, specificSearch);
-    return { status: true, data: mergedData, record: record }; //merging data and sending back
+    return { status: true, data: mergedData }; //merging data and sending back
   }
 
   if (autocomplete == "true") return { status: true, data: searchData }; // if only autocomplete then don't call api
@@ -151,14 +152,32 @@ const searchArtist = async (q) => {
           },
         ],
       },
-      ["name", "type", "image", "perma_url", "id"]
-    ).limit(10);
+      ["name", "type", "image", "perma_url", "artistId"]
+    )
+      .limit(10)
+      .lean();
 
-    return data;
+    return data.map((item) => {
+      item.id = item.artistId;
+      return item;
+    });
   } catch (error) {
     console.log(error.message);
     return [];
   }
+};
+
+const checkEntitySaved = async (data, userId) => {
+  const ids = data.map((item) => item?.id);
+  const savedEntity = await Library.find({ id: { $in: ids }, userId: userId }, [
+    "id",
+  ]);
+  let finalData = data.map((item) => {
+    item.isLiked = false;
+    if (savedEntity.includes(item.id)) item.isLiked = true;
+    return item;
+  });
+  return finalData;
 };
 
 module.exports = { addSearch, searchGet };

@@ -1,14 +1,15 @@
-const { api, mergeOnIds, uniqueItemFromArray } = require("../../utils");
+const { api, uniqueItemFromArray } = require("../../utils");
 const Song = require("../../Database/Models/Song");
 const Search = require("../../Database/Models/Search");
 const Entity = require("../../Database/Models/Entity");
 const Artist = require("../../Database/Models/Artist");
 const searchRecord = require("../../Database/Models/Record");
 const Library = require("../../Database/Models/Library");
+const { getSongs } = require("./manageSongs");
 
-const searchGet = async (q, autocomplete) => {
+const searchGet = async (userId, q, autocomplete) => {
   try {
-    const data = await searchQuery(q, autocomplete);
+    const data = await searchQuery(userId, q, autocomplete);
     return data;
   } catch (error) {
     return error.message;
@@ -37,11 +38,11 @@ const addSearch = async (list) => {
   }
 };
 
-const searchQuery = async (q, autocomplete) => {
+const searchQuery = async (userId, q, autocomplete) => {
   const searching = await searchSearch(q); //searching for Search collection
-  const songs = await searchSongs(q); //searching complete songs collection
-  const entity = await searchEntity(q); //searching entity collection
-  const artist = await searchArtist(q); // searching artist collection
+  const songs = await searchSongs(userId, q); //searching complete songs collection
+  const entity = await searchEntity(userId, q); //searching entity collection
+  const artist = await searchArtist(userId, q); // searching artist collection
 
   const searchData = uniqueItemFromArray([searching, songs, entity, artist]); //merging all data
 
@@ -55,7 +56,7 @@ const searchQuery = async (q, autocomplete) => {
       id: { $in: record },
     });
 
-    const mergedData = uniqueItemFromArray(searchData, specificSearch);
+    const mergedData = uniqueItemFromArray(specificSearch, searchData);
     return { status: true, data: mergedData }; //merging data and sending back
   }
 
@@ -98,25 +99,29 @@ const searchSearch = async (q) => {
   }
 };
 
-const searchSongs = async (q) => {
+const searchSongs = async (userId, q) => {
   try {
-    const data = await Song.find(
-      {
-        $or: [
-          { title: { $regex: `\\b${q}`, $options: "i" } },
-          { subtitle: { $regex: `\\b${q}`, $options: "i" } },
-        ],
-      },
-      ["title", "subtitle", "type", "image", "perma_url", "id"]
-    ).limit(10);
+    const data = (
+      await Song.find(
+        {
+          $or: [
+            { title: { $regex: `\\b${q}`, $options: "i" } },
+            { subtitle: { $regex: `\\b${q}`, $options: "i" } },
+          ],
+        },
+        ["id"]
+      )
+        .limit(10)
+        .lean()
+    ).map((item) => item?.id);
 
-    return data;
+    return await getSongs(data, userId);
   } catch (error) {
     console.log(error.message);
     return [];
   }
 };
-const searchEntity = async (q) => {
+const searchEntity = async (userId, q) => {
   try {
     const data = await Entity.find(
       {
@@ -133,47 +138,58 @@ const searchEntity = async (q) => {
         ],
       },
       ["title", "subtitle", "type", "image", "perma_url", "id"]
-    ).limit(10);
-
-    return data;
-  } catch (error) {
-    console.log(error.message);
-    return [];
-  }
-};
-
-const searchArtist = async (q) => {
-  try {
-    const data = await Artist.find(
-      {
-        $and: [
-          {
-            $or: [{ name: { $regex: `\\b${q}`, $options: "i" } }],
-          },
-        ],
-      },
-      ["name", "type", "image", "perma_url", "artistId"]
     )
       .limit(10)
       .lean();
 
-    return data.map((item) => {
-      item.id = item.artistId;
-      return item;
-    });
+    return await checkEntitySaved(userId, data);
   } catch (error) {
     console.log(error.message);
     return [];
   }
 };
 
-const checkEntitySaved = async (data, userId) => {
+const searchArtist = async (userId, q) => {
+  try {
+    const data = (
+      await Artist.find(
+        {
+          $and: [
+            {
+              $or: [{ name: { $regex: `\\b${q}`, $options: "i" } }],
+            },
+          ],
+        },
+        ["name", "type", "image", "perma_url", "artistId"]
+      )
+        .limit(10)
+        .lean()
+    ).map((item) => {
+      item.id = item.artistId;
+      return item;
+    });
+
+    return await checkEntitySaved(userId, data);
+  } catch (error) {
+    console.log(error.message);
+    return [];
+  }
+};
+
+const checkEntitySaved = async (userId, data) => {
+  //return if there is no data
+  if (data?.length == 0) return [];
+
+  //map only id/artistId
   const ids = data.map((item) => item?.id);
-  const savedEntity = await Library.find({ id: { $in: ids }, userId: userId }, [
-    "id",
-  ]);
+  //search for library with userId and id
+  const savedEntity = (
+    await Library.find({ id: { $in: ids }, userId: userId }, ["id"]).lean()
+  ).map((item) => item?.id);
+
   let finalData = data.map((item) => {
     item.isLiked = false;
+    //if user saved it in library set it to true
     if (savedEntity.includes(item.id)) item.isLiked = true;
     return item;
   });

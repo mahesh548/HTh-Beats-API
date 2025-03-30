@@ -50,19 +50,35 @@ const searchQuery = async (userId, q, autocomplete, page) => {
 
   const record = await searchRecord.findQuerySound(q); // if result not enough search if search term is already called to api
 
-  if (searchData.length >= 20) return { status: true, data: searchData }; //return data to user if result is enough
+  if (searchData.length >= 20)
+    return {
+      status: true,
+      data: searchData,
+      hasMore: searchData.length < totalResult,
+      page: page,
+    }; //return data to user if result is enough
 
   if (record.length != 0) {
     //if already searched by api then get item by their specific id
     const specificSearch = await Search.find({
       id: { $in: record },
     });
-
+    const prevLength = searchData.length;
     const mergedData = uniqueItemFromArray(specificSearch, searchData);
-    return { status: true, data: mergedData }; //merging data and sending back
+    totalResult = totalResult + (mergedData.length - prevLength);
+    return {
+      status: true,
+      data: mergedData,
+      hasMore: mergedData.length < totalResult,
+      page: page,
+    }; //merging data and sending back
   }
 
-  if (autocomplete == "true") return { status: true, data: searchData }; // if only autocomplete then don't call api
+  if (autocomplete == "true")
+    return {
+      status: true,
+      data: searchData,
+    }; // if only autocomplete then don't call api
 
   const data = await api(
     `https://www.jiosaavn.com/api.php?__call=autocomplete.get&_format=json&_marker=0&cc=in&includeMetaTags=1&query=${q}`

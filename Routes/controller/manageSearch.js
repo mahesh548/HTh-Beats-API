@@ -7,9 +7,11 @@ const searchRecord = require("../../Database/Models/Record");
 const Library = require("../../Database/Models/Library");
 const { getSongs } = require("./manageSongs");
 
-const searchGet = async (userId, q, autocomplete) => {
+let totalResult = 0;
+
+const searchGet = async (userId, q, autocomplete, page) => {
   try {
-    const data = await searchQuery(userId, q, autocomplete);
+    const data = await searchQuery(userId, q, autocomplete, page);
     return data;
   } catch (error) {
     return error.message;
@@ -38,11 +40,11 @@ const addSearch = async (list) => {
   }
 };
 
-const searchQuery = async (userId, q, autocomplete) => {
-  const searching = await searchSearch(q); //searching for Search collection
-  const songs = await searchSongs(userId, q); //searching complete songs collection
-  const entity = await searchEntity(userId, q); //searching entity collection
-  const artist = await searchArtist(userId, q); // searching artist collection
+const searchQuery = async (userId, q, autocomplete, page) => {
+  const searching = await searchSearch(q, page); //searching for Search collection
+  const songs = await searchSongs(userId, q, page); //searching complete songs collection
+  const entity = await searchEntity(userId, q, page); //searching entity collection
+  const artist = await searchArtist(userId, q, page); // searching artist collection
 
   const searchData = uniqueItemFromArray([searching, songs, entity, artist]); //merging all data
 
@@ -80,17 +82,23 @@ const searchQuery = async (userId, q, autocomplete) => {
   return { status: true, data: apiData };
 };
 
-const searchSearch = async (q) => {
+const searchSearch = async (q, page) => {
   try {
-    const data = await Search.find(
-      {
-        $or: [
-          { title: { $regex: `\\b${q}`, $options: "i" } },
-          { subtitle: { $regex: `\\b${q}`, $options: "i" } },
-        ],
-      },
-      ["title", "subtitle", "type", "image", "url", "perma_url", "id"]
-    ).limit(20);
+    const limit = 20;
+    const skip = (page - 1) * limit;
+    const query = {
+      $or: [
+        { title: { $regex: `\\b${q}`, $options: "i" } },
+        { subtitle: { $regex: `\\b${q}`, $options: "i" } },
+      ],
+    };
+    const data = await Search.find(query)
+      .select("title subtitle type image url perma_url id")
+      .skip(skip)
+      .limit(limit);
+
+    const totalItems = await Search.countDocuments(query);
+    totalResult = totalResult + totalItems;
 
     return data;
   } catch (error) {
@@ -99,21 +107,23 @@ const searchSearch = async (q) => {
   }
 };
 
-const searchSongs = async (userId, q) => {
+const searchSongs = async (userId, q, page) => {
   try {
+    const limit = 10;
+    const skip = (page - 1) * limit;
+    const query = {
+      $or: [
+        { title: { $regex: `\\b${q}`, $options: "i" } },
+        { subtitle: { $regex: `\\b${q}`, $options: "i" } },
+      ],
+    };
+
     const data = (
-      await Song.find(
-        {
-          $or: [
-            { title: { $regex: `\\b${q}`, $options: "i" } },
-            { subtitle: { $regex: `\\b${q}`, $options: "i" } },
-          ],
-        },
-        ["id"]
-      )
-        .limit(10)
-        .lean()
+      await Song.find(query).select("id").skip(skip).limit(10).lean()
     ).map((item) => item?.id);
+
+    const totalItems = await Song.countDocuments(query);
+    totalResult = totalResult + totalItems;
 
     return await getSongs(data, userId);
   } catch (error) {
@@ -121,26 +131,31 @@ const searchSongs = async (userId, q) => {
     return [];
   }
 };
-const searchEntity = async (userId, q) => {
+const searchEntity = async (userId, q, page) => {
   try {
-    const data = await Entity.find(
-      {
-        $and: [
-          {
-            $or: [
-              { title: { $regex: `\\b${q}`, $options: "i" } },
-              { subtitle: { $regex: `\\b${q}`, $options: "i" } },
-            ],
-          },
-          {
-            $or: [{ userId: { $exists: false } }, { userId: { $size: 0 } }],
-          },
-        ],
-      },
-      ["title", "subtitle", "type", "image", "perma_url", "id"]
-    )
-      .limit(10)
+    const limit = 10;
+    const skip = (page - 1) * limit;
+    const query = {
+      $and: [
+        {
+          $or: [
+            { title: { $regex: `\\b${q}`, $options: "i" } },
+            { subtitle: { $regex: `\\b${q}`, $options: "i" } },
+          ],
+        },
+        {
+          $or: [{ userId: { $exists: false } }, { userId: { $size: 0 } }],
+        },
+      ],
+    };
+    const data = await Entity.find(query)
+      .select("title subtitle type image perma_url id")
+      .skip(skip)
+      .limit(limit)
       .lean();
+
+    const totalItems = await Entity.countDocuments(query);
+    totalResult = totalResult + totalItems;
 
     return await checkEntitySaved(userId, data);
   } catch (error) {
@@ -149,25 +164,31 @@ const searchEntity = async (userId, q) => {
   }
 };
 
-const searchArtist = async (userId, q) => {
+const searchArtist = async (userId, q, page) => {
   try {
-    const data = (
-      await Artist.find(
+    const limit = 10;
+    const skip = (page - 1) * limit;
+    const query = {
+      $and: [
         {
-          $and: [
-            {
-              $or: [{ name: { $regex: `\\b${q}`, $options: "i" } }],
-            },
-          ],
+          $or: [{ name: { $regex: `\\b${q}`, $options: "i" } }],
         },
-        ["name", "type", "image", "perma_url", "artistId"]
-      )
+      ],
+    };
+
+    const data = (
+      await Artist.find(query)
+        .select("name type image perma_url artistId")
+        .skip(skip)
         .limit(10)
         .lean()
     ).map((item) => {
       item.id = item.artistId;
       return item;
     });
+
+    const totalItems = await Artist.countDocuments(query);
+    totalResult = totalResult + totalItems;
 
     return await checkEntitySaved(userId, data);
   } catch (error) {

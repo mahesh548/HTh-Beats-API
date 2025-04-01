@@ -64,7 +64,7 @@ const searchQuery = async (userId, q, autocomplete, page) => {
       id: { $in: record },
     });
     const prevLength = searchData.length;
-    const mergedData = uniqueItemFromArray(specificSearch, searchData);
+    const mergedData = uniqueItemFromArray([specificSearch, searchData]);
     totalResult = totalResult + (mergedData.length - prevLength);
     return {
       status: true,

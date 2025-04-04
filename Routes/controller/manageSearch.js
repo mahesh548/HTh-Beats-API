@@ -41,50 +41,65 @@ const addSearch = async (list) => {
 };
 
 const searchQuery = async (userId, q, autocomplete, page) => {
-  const searching = await searchSearch(q, page); //searching for Search collection
-  const songs = await searchSongs(userId, q, page); //searching complete songs collection
-  const entity = await searchEntity(userId, q, page); //searching entity collection
-  const artist = await searchArtist(userId, q, page); // searching artist collection
+  const [searchingRes, songsRes, entityRes, artistRes] = await Promise.all([
+    searchSearch(q, page),
+    searchSongs(userId, q, page),
+    searchEntity(userId, q, page),
+    searchArtist(userId, q, page),
+  ]);
 
-  const searchData = uniqueItemFromArray([searching, songs, entity, artist]); //merging all data
+  const { data: searching, totalItems: searchTotal } = searchingRes;
+  const { data: songs, totalItems: songsTotal } = songsRes;
+  const { data: entity, totalItems: entityTotal } = entityRes;
+  const { data: artist, totalItems: artistTotal } = artistRes;
 
-  const record = await searchRecord.findQuerySound(q); // if result not enough search if search term is already called to api
+  const searchData = uniqueItemFromArray([searching, songs, entity, artist]);
+
+  const hasMore =
+    page * 20 < searchTotal ||
+    page * 10 < songsTotal ||
+    page * 10 < entityTotal ||
+    page * 10 < artistTotal;
+
+  const record = await searchRecord.findQuerySound(q, page);
 
   if (searchData.length >= 20)
     return {
       status: true,
       data: searchData,
-      hasMore: searchData.length < totalResult,
-      page: page,
-    }; //return data to user if result is enough
+      hasMore,
+      page,
+    };
 
-  if (record.length != 0) {
-    //if already searched by api then get item by their specific id
-    const specificSearch = await Search.find({
-      id: { $in: record },
-    });
-    const prevLength = searchData.length;
+  if (record.length !== 0) {
+    const { data: specificSearch, totalItems: specificTotal } =
+      await queryRecord(record, page);
+
     const mergedData = uniqueItemFromArray([specificSearch, searchData]);
-    totalResult = totalResult + (mergedData.length - prevLength);
+
+    const mergedHasMore = page * 10 < specificTotal || hasMore;
     return {
       status: true,
       data: mergedData,
-      hasMore: mergedData.length < totalResult,
-      page: page,
-    }; //merging data and sending back
+      hasMore: mergedHasMore,
+      page,
+    };
   }
 
-  if (autocomplete == "true")
+  if (autocomplete === "true")
     return {
       status: true,
       data: searchData,
-    }; // if only autocomplete then don't call api
+    };
+
+  if (page > 1) return { status: true, data: [], hasMore: false, page };
 
   const data = await api(
     `https://www.jiosaavn.com/api.php?__call=autocomplete.get&_format=json&_marker=0&cc=in&includeMetaTags=1&query=${q}`
   );
 
-  if (!data.status) return res.status(500).json({ status: "api error" });
+  if (!data.status) return { status: false, message: "api error" };
+
   const apiData = [
     ...data.data?.albums?.data,
     ...data.data?.songs?.data,
@@ -94,7 +109,8 @@ const searchQuery = async (userId, q, autocomplete, page) => {
   ];
 
   const savedIds = await addSearch(apiData);
-  await new searchRecord({ query: q, ids: savedIds }).save(); //saving search term and results ads
+  await new searchRecord({ query: q, ids: savedIds }).save();
+
   return { status: true, data: apiData };
 };
 
@@ -108,18 +124,17 @@ const searchSearch = async (q, page) => {
         { subtitle: { $regex: `\\b${q}`, $options: "i" } },
       ],
     };
+
     const data = await Search.find(query)
       .select("title subtitle type image url perma_url id")
       .skip(skip)
       .limit(limit);
 
     const totalItems = await Search.countDocuments(query);
-    totalResult = totalResult + totalItems;
-
-    return data;
+    return { data, totalItems };
   } catch (error) {
     console.log(error.message);
-    return [];
+    return { data: [], totalItems: 0 };
   }
 };
 
@@ -135,18 +150,18 @@ const searchSongs = async (userId, q, page) => {
     };
 
     const data = (
-      await Song.find(query).select("id").skip(skip).limit(10).lean()
+      await Song.find(query).select("id").skip(skip).limit(limit).lean()
     ).map((item) => item?.id);
 
     const totalItems = await Song.countDocuments(query);
-    totalResult = totalResult + totalItems;
-
-    return await getSongs(data, userId);
+    const songs = await getSongs(data, userId);
+    return { data: songs, totalItems };
   } catch (error) {
     console.log(error.message);
-    return [];
+    return { data: [], totalItems: 0 };
   }
 };
+
 const searchEntity = async (userId, q, page) => {
   try {
     const limit = 10;
@@ -164,6 +179,7 @@ const searchEntity = async (userId, q, page) => {
         },
       ],
     };
+
     const data = await Entity.find(query)
       .select("title subtitle type image perma_url id")
       .skip(skip)
@@ -171,12 +187,11 @@ const searchEntity = async (userId, q, page) => {
       .lean();
 
     const totalItems = await Entity.countDocuments(query);
-    totalResult = totalResult + totalItems;
-
-    return await checkEntitySaved(userId, data);
+    const finalData = await checkEntitySaved(userId, data);
+    return { data: finalData, totalItems };
   } catch (error) {
     console.log(error.message);
-    return [];
+    return { data: [], totalItems: 0 };
   }
 };
 
@@ -192,24 +207,40 @@ const searchArtist = async (userId, q, page) => {
       ],
     };
 
-    const data = (
-      await Artist.find(query)
-        .select("name type image perma_url artistId")
-        .skip(skip)
-        .limit(10)
-        .lean()
-    ).map((item) => {
+    const raw = await Artist.find(query)
+      .select("name type image perma_url artistId")
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    const data = raw.map((item) => {
       item.id = item.artistId;
       return item;
     });
 
     const totalItems = await Artist.countDocuments(query);
-    totalResult = totalResult + totalItems;
-
-    return await checkEntitySaved(userId, data);
+    const finalData = await checkEntitySaved(userId, data);
+    return { data: finalData, totalItems };
   } catch (error) {
     console.log(error.message);
-    return [];
+    return { data: [], totalItems: 0 };
+  }
+};
+
+const queryRecord = async (ids, page) => {
+  try {
+    const limit = 10;
+    const skip = (page - 1) * limit;
+    const query = { id: { $in: ids } };
+
+    const data = await Search.find(query).skip(skip).limit(limit).lean();
+
+    const totalItems = await Search.countDocuments(query);
+
+    return { data: data, totalItems };
+  } catch (error) {
+    console.log(error.message);
+    return { data: [], totalItems: 0 };
   }
 };
 

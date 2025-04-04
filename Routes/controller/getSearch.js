@@ -4,7 +4,7 @@ const getSearch = async (req, res) => {
   const q = req?.query?.q.toLowerCase().trim();
   const autocomplete = req?.query?.autocomplete;
   const user = req.body.user;
-  const page = parseInt(req?.query?.page) || 1;
+  const page = Math.max(Number(req?.query?.page) || 1, 1);
   if (!q || !autocomplete)
     return res
       .status(400)

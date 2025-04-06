@@ -111,7 +111,7 @@ const searchQuery = async (userId, q, autocomplete, page) => {
   const savedIds = await addSearch(apiData);
   await new searchRecord({ query: q, ids: savedIds }).save();
 
-  return { status: true, data: apiData };
+  return { status: true, data: apiData, page: 1, hasMore: false };
 };
 
 const searchSearch = async (q, page) => {

@@ -1,5 +1,40 @@
-const languages = ["Hindi", "English", "Bhojpuri", "Punjabi"];
-const smallLanguages = ["hindi", "english", "bhojpuri", "punjabi"];
+const languages = [
+  "Hindi",
+  "English",
+  "Punjabi",
+  "Tamil",
+  "Telugu",
+  "Marathi",
+  "Gujarati",
+  "Bengali",
+  "Kannada",
+  "Bhojpuri",
+  "Malayalam",
+  "Urdu",
+  "Haryanvi",
+  "Rajasthani",
+  "Odia",
+  "Assamese",
+];
+const smallLanguages = [
+  "hindi",
+  "english",
+  "punjabi",
+  "tamil",
+  "telugu",
+  "marathi",
+  "gujarati",
+  "bengali",
+  "kannada",
+  "bhojpuri",
+  "malayalam",
+  "urdu",
+  "haryanvi",
+  "rajasthani",
+  "odia",
+  "assamese",
+];
+
 const axios = require("axios");
 
 const urls = {

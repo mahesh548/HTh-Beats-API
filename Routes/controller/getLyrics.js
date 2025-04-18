@@ -13,13 +13,13 @@ const getLyrics = async (req, res) => {
   try {
     const lyricsData = await Lyrics.findOne({ id: id });
     if (lyricsData) {
-      return res.status(200).json(lyricsData);
+      return res.status(200).json({ status: true, lyrics: lyricsData.lyrics });
     }
     const data = await api(getUrl(id));
     if (!data.status) return res.status(500).json({ status: "api error" });
     if (data.data?.lyrics) {
       await new Lyrics({ id: id, lyrics: data.data?.lyrics }).save();
-      return res.status(200).json(data.data);
+      return res.status(200).json({ status: true, lyrics: data.data?.lyrics });
     }
     res.status(200).json({});
   } catch (error) {

@@ -1,5 +1,4 @@
 const { api, objToArr, dura } = require("../../utils");
-const Song = require("../../Database/Models/Song");
 const { addSongs, getSongs } = require("./manageSongs");
 const Queue = require("../../Database/Models/Queue");
 const getUrl = (type, ids) => {
@@ -22,12 +21,12 @@ const getQueue = async (req, res) => {
 
   if (entityIds?.length == 0 || !Array.isArray(entityIds))
     return res
-      .status(400)
+      .status(200)
       .json({ status: false, msg: "Entity IDs are missing!" });
   try {
     const queueFind = await Queue.findOne({ station: entityIds.sort() });
     if (queueFind && dura(queueFind.createdAt).hrs < 160) {
-      const respondData = await getSongs(entityIds, user.id);
+      const respondData = await getSongs(queueFind.ids, user.id);
       return res.status(200).json({ status: true, data: respondData });
     }
     const data = await api(getUrl("id", entityIds));

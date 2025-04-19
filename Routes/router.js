@@ -32,7 +32,7 @@ router.get("/api/related", getRelated);
 router.get("/api/trending", getTrending);
 
 // query: "entityIds" array of song IDs
-router.get("/api/queue", getQueue);
+router.post("/api/queue", getQueue);
 
 // query: "entity" featured,artist & "name" radio,artist & "lang"
 router.get("/api/radio", getRadio);

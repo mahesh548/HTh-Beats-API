@@ -61,7 +61,7 @@ const getEntity = async (req, res) => {
     if (id.length == 20)
       return res
         .status(200)
-        .json({ status: false, msg: "Playlist is unavailable!" });
+        .json({ status: false, msg: "Playlist is unavailable!", id: id });
 
     console.log("calling jio saavan api...");
     const data = await api(getEntityUrl(entityType, id));
@@ -86,7 +86,7 @@ const getEntity = async (req, res) => {
     console.log("Get Entity Error:", error);
     return res
       .status(200)
-      .json({ status: false, msg: "Playlist is unavailable!" });
+      .json({ status: false, msg: "Playlist is unavailable!", error: error });
   }
 };
 const checkPlaylistType = (response, userId) => {

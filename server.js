@@ -29,6 +29,6 @@ app.use(auth);
 //router
 app.use(router);
 
-app.listen(5000, () => {
-  console.log("API listening on port 5000...");
+app.listen(process.env.PORT, () => {
+  console.log(`API listening on port ${process.env.PORT}...`);
 });

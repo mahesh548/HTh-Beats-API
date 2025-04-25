@@ -63,7 +63,9 @@ const getEntity = async (req, res) => {
         .status(200)
         .json({ status: false, msg: "Playlist is unavailable!" });
 
+    console.log("calling jio saavan api...");
     const data = await api(getEntityUrl(entityType, id));
+    console.log("response from jio saavan", data);
 
     if (!data.status) return res.status(500).json({ status: "api error" });
 

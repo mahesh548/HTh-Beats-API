@@ -10,8 +10,11 @@ const getTrending = require("./controller/getTrending");
 const getQueue = require("./controller/getQueue");
 const getRadio = require("./controller/getRadio");
 const getLyrics = require("./controller/getLyrics");
+const getMeta = require("./controller/getMeta");
 
 const router = express.Router();
+
+router.get("/api/meta/:entity/:id", getMeta);
 
 // query: "lang" array e.g [Hindi,English]
 router.get("/api/home", getHome);

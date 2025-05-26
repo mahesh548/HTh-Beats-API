@@ -46,4 +46,9 @@ router.get("/api/lyrics", getLyrics);
 // para: "entity" playlist,album,mix & query: "id"
 router.get("/api/entity/:entity", getEntity);
 
+// Health check endpoint
+router.get("/ping", (req, res) => {
+  res.status(200).json({ status: true, msg: "Pong!" });
+});
+
 module.exports = router;

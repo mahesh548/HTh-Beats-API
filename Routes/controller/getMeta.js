@@ -1,5 +1,3 @@
-const { getEntityUrl } = require("../../utils");
-
 const Entity = require("../../Database/Models/Entity");
 const Song = require("../../Database/Models/Song");
 const Artist = require("../../Database/Models/Artist");
@@ -31,7 +29,7 @@ const getMeta = async (req, res) => {
           status: true,
           title: title,
           subtitle: `${subtitle}, ${header_desc}`,
-          image: image,
+          image: image.replace("150x150.jpg", "500x500.jpg"),
         };
         return res.status(200).json(metaData);
       }
@@ -45,7 +43,7 @@ const getMeta = async (req, res) => {
           status: true,
           title: title,
           subtitle: `${subtitle}`,
-          image: image,
+          image: image.replace("150x150.jpg", "500x500.jpg"),
         };
         return res.status(200).json(metaData);
       }
@@ -58,11 +56,15 @@ const getMeta = async (req, res) => {
           status: true,
           title: name,
           subtitle: `${subtitle}`,
-          image: image,
+          image: image.replace("150x150.jpg", "500x500.jpg"),
         };
         return res.status(200).json(metaData);
       }
     }
+    return res.status(200).json({
+      status: true,
+      msg: "No Meta Data Available!",
+    });
   } catch (error) {
     console.log("Get Entity Error:", error);
     return res

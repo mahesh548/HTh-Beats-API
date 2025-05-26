@@ -10,12 +10,16 @@ const getMeta = async (req, res) => {
   const secret = req?.query?.secret;
   const metaSecret = process.env.META_SECRET;
 
-  if (getEntityUrl(entityType).length == 0 || !id || secret !== metaSecret)
+  if (!entityType || !id || secret !== metaSecret)
     return res
       .status(400)
-      .json({ status: false, msg: "Entity id or types are missing!" });
+      .json({ status: false, msg: "No Meta Data Available!" });
   try {
-    if (entityType != "song" && entityType != "artist") {
+    if (
+      entityType == "playlist" ||
+      entityType == "album" ||
+      entityType == "mix"
+    ) {
       const entityData = await Entity.findOne({
         perma_url: id,
       });
@@ -26,7 +30,7 @@ const getMeta = async (req, res) => {
         const metaData = {
           status: true,
           title: title,
-          subtite: `${subtitle}, ${header_desc}`,
+          subtitle: `${subtitle}, ${header_desc}`,
           image: image,
         };
         return res.status(200).json(metaData);
@@ -40,7 +44,7 @@ const getMeta = async (req, res) => {
         const metaData = {
           status: true,
           title: title,
-          subtite: `${subtitle}`,
+          subtitle: `${subtitle}`,
           image: image,
         };
         return res.status(200).json(metaData);
@@ -53,7 +57,7 @@ const getMeta = async (req, res) => {
         const metaData = {
           status: true,
           title: name,
-          subtite: `${subtitle}`,
+          subtitle: `${subtitle}`,
           image: image,
         };
         return res.status(200).json(metaData);
@@ -63,7 +67,7 @@ const getMeta = async (req, res) => {
     console.log("Get Entity Error:", error);
     return res
       .status(200)
-      .json({ status: false, msg: "Playlist is unavailable!", error: error });
+      .json({ status: false, msg: "No Meta Data Available!", error: error });
   }
 };
 

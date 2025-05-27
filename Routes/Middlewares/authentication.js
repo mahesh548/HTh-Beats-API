@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const Users = require("../../Database/Models/Users");
 const auth = async (req, res, next) => {
-  if (req.path.startsWith("/api/meta/")) {
+  if (req.path.startsWith("/api/meta/") || req.path.startsWith("/ping")) {
     return next();
   }
   if (!req?.headers?.authorization)

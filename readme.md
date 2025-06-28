@@ -9,15 +9,15 @@
   <img src="https://img.shields.io/badge/Express.js-Backend-black?logo=express" />
   <img src="https://img.shields.io/badge/Hosted%20on-Azure%20App%20Services-blue?logo=azure-devops" />
   <img src="https://img.shields.io/badge/Primary%20API-HTh%20Beats-lightgrey" />
-    <a href="https://hthbeats.vercel.app">
-  <img src="https://img.shields.io/badge/CORS-hthbeats.vercel.app-important" />
+    <a href="https://hthbeats.online">
+  <img src="https://img.shields.io/badge/CORS-hthbeats.online-important" />
   </a>
   <img src="https://img.shields.io/badge/License-MIT-yellow.svg" />
 </p>
 
 > ✅ Live URL: [hthbeats-api-bzbgepaqcug2abb4.centralindia-01.azurewebsites.net](hthbeats-api-bzbgepaqcug2abb4.centralindia-01.azurewebsites.net)
 
-<i>This url only allows requests from our frontend (hthbeats.vercel.app). please do not use this link in your project.</i>
+<i>This url only allows requests from our frontend (hthbeats.online). please do not use this link in your project.</i>
 
 ---
 
@@ -38,16 +38,16 @@ This server is written in **Express.js**, hosted on **Azure App Services**, and 
 
 ## 🧠 Tech Stack
 
-| Layer        | Tech Used                         |
-| ------------ | --------------------------------- |
-| Runtime      | Node.js 22.1.0                    |
-| Framework    | Express.js                        |
-| Hosting      | Azure App Services                |
-| Caching DB   | MongoDB Atlas (via Mongoose)      |
-| Data Source  | JioSaavn (scraped APIs)           |
-| Security     | CORS (`hthbeats.vercel.app` only) |
-| Meta Preview | Minimal via META_SECRET           |
-| Auth         | JWT (shared with backend)         |
+| Layer        | Tech Used                     |
+| ------------ | ----------------------------- |
+| Runtime      | Node.js 22.1.0                |
+| Framework    | Express.js                    |
+| Hosting      | Azure App Services            |
+| Caching DB   | MongoDB Atlas (via Mongoose)  |
+| Data Source  | JioSaavn (scraped APIs)       |
+| Security     | CORS (`hthbeats.online` only) |
+| Meta Preview | Minimal via META_SECRET       |
+| Auth         | JWT (shared with backend)     |
 
 ---
 
@@ -59,7 +59,7 @@ This server is written in **Express.js**, hosted on **Azure App Services**, and 
 - 🧠 Personalized launch screen based on user’s language
 - 🎶 Queue generation for user sessions
 - 🔐 Minimal support for bot-based metadata (e.g., Open Graph for social preview)
-- CORS protected: accepts only frontend requests from `hthbeats.vercel.app`
+- CORS protected: accepts only frontend requests from `hthbeats.online`
 
 ---
 

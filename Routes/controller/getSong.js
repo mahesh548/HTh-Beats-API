@@ -1,6 +1,6 @@
 const { api } = require("../../utils");
 const Song = require("../../Database/Models/Song");
-const { addSongs } = require("../controller/manageSongs");
+const { addSongs, addVideoToSongs } = require("../controller/manageSongs");
 const Entity = require("../../Database/Models/Entity");
 const getSong = async (req, res) => {
   const id = req?.query?.id;
@@ -19,8 +19,8 @@ const getSong = async (req, res) => {
         .filter((playlist) => playlist.idList.includes(songData.id))
         .map((playlist) => playlist.id);
       songData.savedIn = playThatSaveIt;
-
-      return res.status(200).json(songData);
+      const result = await addVideoToSongs([songData]);
+      return res.status(200).json(result[0]);
     }
     const data = await api(
       `https://www.jiosaavn.com/api.php?__call=webapi.get&token=${id}&type=song&includeMetaTags=0&ctx=web6dot0&api_version=4&_format=json&_marker=0`
@@ -28,7 +28,8 @@ const getSong = async (req, res) => {
     if (!data.status) return res.status(500).json({ status: "api error" });
     await addSongs(data.data.songs);
     data.data.songs[0].savedIn = [];
-    res.status(200).json(data.data?.songs[0]);
+    const result = await addVideoToSongs([data.data?.songs[0]]);
+    res.status(200).json(result[0]);
   } catch (error) {
     res.status(500).json({ status: false, msg: error.message });
   }

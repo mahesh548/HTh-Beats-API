@@ -11,7 +11,7 @@ const auth = async (req, res, next) => {
   if (!session) return res.status(401).json({ status: false, auth: false });
   const secrate = process.env.SECRATE;
   try {
-    const user = jwt.verify(session, secrate);
+    const user = jwt.verify(session, secrate, { algorithms: ["HS256"] });
 
     const realUser = await Users.findOne({
       id: user.id,

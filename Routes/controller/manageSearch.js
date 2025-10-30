@@ -61,15 +61,16 @@ const searchQuery = async (userId, q, autocomplete, page) => {
     page * 10 < entityTotal ||
     page * 10 < artistTotal;
 
-  const record = await searchRecord.findQuerySound(q, page);
-
-  if (searchData.length >= 20)
+  if (searchData.length >= 20) {
     return {
       status: true,
       data: searchData,
       hasMore,
       page,
     };
+  }
+
+  const record = await searchRecord.findQuerySound(q, page);
 
   if (record.length !== 0) {
     const { data: specificSearch, totalItems: specificTotal } =

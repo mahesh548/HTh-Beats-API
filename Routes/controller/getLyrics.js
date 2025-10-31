@@ -23,7 +23,7 @@ https://www.saavn.com/api.php
  `;
 
   const { data } = await api(url);
-  return data?.subtitles_cdn_uri;
+  return data?.subtitles_cdn_uri || data?.lyrics_cdn_uri;
 };
 const getLyrics = async (req, res) => {
   const id = req?.query?.id;
